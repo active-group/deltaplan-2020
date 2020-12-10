@@ -289,6 +289,11 @@ module Examples =
 
   let addToMap key value (Map map) = Map ((key, value)::map)
 
+  let map1 = emptyMap
+             |> addToMap "Mike" 5
+             |> addToMap "Till" 7
+             |> addToMap "Selim" 8
+
   (*
   type option<'a> = None | Some of 'a
   *)
