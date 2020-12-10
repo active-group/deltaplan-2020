@@ -47,7 +47,6 @@
     <Compile Include="Script.fsx" />
     <None Include="packages.config" />
     <Compile Include="Data.fs" />
-    <Compile Include="Data.fsi" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>
