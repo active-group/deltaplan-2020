@@ -221,13 +221,14 @@ module Examples =
         ((feedAnimal amount) first)
          :: (feedAnimals amount rest)
 
-
+  // val forEach :: ('a -> 'b) -> (list<'a> -> list<'b>)
   let rec forEach (f: 'a -> 'b) (list: list<'a>): list<'b> =
     match list with
     | [] -> []
     | (first::rest) ->
         (f first)
           :: (forEach f rest)
+
 
 
   // 3 + 2 + 1
