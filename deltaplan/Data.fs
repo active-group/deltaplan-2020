@@ -109,6 +109,18 @@ module Examples =
     | Snake { length = l; thickness = t } ->
         Snake { length = l; thickness = t + amount }
 
+
+  // Idee: Moses Schönfinkel
+  //       Haskell Curry
+
+  // val uncurry: ('a -> 'b -> 'c) -> ('a * 'b -> 'c)
+  let uncurry f (a, b) = f a b
+  // val curry: ('a * 'b -> 'c) -> ('a -> 'b -> 'c)
+  // schönfinkeln
+  // currifizieren
+  let curry f a  b  = f (a, b)
+
+
   // feedAnimal2(1, animal1) 
 
   // Eine Liste ist eins der folgenden:
@@ -266,3 +278,31 @@ module Examples =
 
   let rev' (list: list<'a>): list<'a> =
     revHelper list []
+
+
+  type Map<'key, 'value> = Map of list<'key * 'value>
+
+  let emptyMap = Map []
+
+  // Typ vorher:
+  // 'key -> 'value -> list<'key * 'value> -> list<'key * 'value>
+
+  let addToMap key value (Map map) = Map ((key, value)::map)
+
+  (*
+  type option<'a> = None | Some of 'a
+  *)
+
+  let rec lookupMap (key: 'key) (Map map: Map<'key, 'value>): option<'value> =
+    match map with
+    | [] -> None
+    | ((key', value')::rest) ->
+        match key' with
+        | key -> Some value'
+        | _-> lookupMap key (Map rest)
+
+//        if key = key'
+//        then Some value'
+//        else lookupMap key (Map rest)
+
+
