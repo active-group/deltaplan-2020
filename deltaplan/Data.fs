@@ -379,7 +379,10 @@ module Examples =
   type ResultBuilder() =
     member this.Bind(result: Result<'a, 'error>,
                      next: 'a -> Result<'b, 'error>): Result<'b, 'error> =
-      Result.bind next result
+      // Result.bind next result
+      match result with
+      | Ok value -> next value
+      | Error descr -> Error descr
 
     member this.Return(value: 'a): Result<'a, 'error> = Ok value
 
@@ -392,11 +395,18 @@ module Examples =
 
 
   let validateRequest name email =
+    (*
     with_railway {
-        let! name = validateName name
-        let! email = validateEmail email
-        return { Name = name; Email = email }
+        let! name' = validateName name
+        let! email' = validateEmail email
+        return { Name = name'; Email = email' }
     }
+    *)
+    with_railway.Bind(validateName name,
+      fun name ->
+         with_railway.Bind(validateEmail email,
+           fun email ->
+              Ok { Name = name; Email = email }))
 
 
   (*
@@ -445,8 +455,9 @@ module Examples =
 
   let db = new DBBuilder()
 
-  let get key = Get (key, Done)
-  let put key value = Put (key, value, Done)
+  let get (key: string): DB<int> = Get (key, Done)
+  let put (key: string) (value: int): DB<unit> =
+    Put (key, value, Done)
 
   let p1' = db {
     let! () = put "Mike" 5
@@ -454,3 +465,14 @@ module Examples =
     let! () = put "Mike" (x+1)
     return (x+5)
   }
+
+  let rec runDB (db: DB<'a>) (map: Map<string, int>): 'a =
+    match db with
+    | Get (key, callback) ->
+        let value = Option.get (lookupMap key map)
+        runDB (callback value) map
+    | Put (key, value, callback) ->
+        let map' = addToMap key value map
+        runDB (callback ()) map'
+    | Done result -> result
+
