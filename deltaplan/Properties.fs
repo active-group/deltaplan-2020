@@ -38,6 +38,14 @@ type ISet = list<int * int>
 // 4. Die Intervalle sind nach Größe sortiert
 
 module ISet =
+
+    let rec isValid iset =
+        match iset with
+        | (lo1, hi1)::(lo2, hi2)::rest ->
+            lo1 <= hi1 && hi1+1 < lo2 && isValid ((lo2, hi2)::rest)
+        | [(lo1, hi1)] -> lo1 <= hi1
+        | [] -> true
+
     // Interval in Liste von Zahlen umwandeln
     let rec range lo hi =
       if lo > hi
@@ -62,13 +70,16 @@ module ISet =
     let toList iset =
         mmerge (List.map (fun (lo, hi) -> range lo hi) iset)
 
-
     let rec union (iset1: ISet) (iset2: ISet): ISet =
         match (iset1, iset2) with
         | ([], iset2) -> iset2
         | (iset1, []) -> iset1
         | ((lo1, hi1)::rest1, (lo2, hi2)::rest2) ->
-            (min lo1 lo2, max hi1 hi2)::(union rest1 rest2) 
+            if hi1 + 1 < lo2
+            then (lo1, hi1)::(union rest1 iset2)
+            else if hi2 + 1 < lo1
+            then (lo2, hi2)::(union iset1 rest2)
+            else (min lo1 lo2, max hi1 hi2)::(union rest1 rest2) 
 
     module Arb =
       open FsCheck
@@ -100,3 +111,7 @@ module ISet =
             Prop.forAll (Arb.pair Arb.iset Arb.iset) (fun (iset1, iset2) ->
               (toList (union iset1 iset2)) =
                 (merge2 (toList iset1) (toList iset2)))
+
+        let unionValid =
+             Prop.forAll (Arb.pair Arb.iset Arb.iset) (fun (iset1, iset2) ->
+                isValid (union iset1 iset2))
