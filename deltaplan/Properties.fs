@@ -67,6 +67,8 @@ module ISet =
         match (iset1, iset2) with
         | ([], iset2) -> iset2
         | (iset1, []) -> iset1
+        | ((lo1, hi1)::rest1, (lo2, hi2)::rest2) ->
+            (min lo1 lo2, max hi1 hi2)::(union rest1 rest2)
 
     module Arb =
       open FsCheck
