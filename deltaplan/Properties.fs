@@ -65,13 +65,33 @@ module ISet =
 
     let rec union (iset1: ISet) (iset2: ISet): ISet = []
 
+    module Arb =
+      open FsCheck
+      open FsCheck.Util
+
+      let rec dropOverlaps iset =
+        match iset with
+        | ((_, a) as i)::((b, _) as j) :: rest when a + 1 < b ->
+            i :: dropOverlaps (j::rest)
+        | (i::_::rest) -> dropOverlaps (i::rest)
+        | rest -> rest           
+
+      let iset =
+        let gen =
+              Gen.map 
+                (fun lis -> dropOverlaps 
+                             (List.sortBy fst
+                               (List.map (fun (a, b) -> (min a b, max a b)) lis)))
+                (Arb.toGen (Arb.list (Arb.pair Arb.nonNegativeInt Arb.nonNegativeInt)))
+        let shrink = Arb.shrinkList (fun _ -> Seq.empty)
+        Arb.fromGenShrink (gen, shrink)
+
+
     module Test =
         open FsCheck
         open FsCheck.Util
 
         let unionCorrect =
             Prop.forAll (Arb.pair Arb.iset Arb.iset) (fun (iset1, iset2) ->
-              (toList (union iset1 iset2))
-              =
-              (merge2 (toList iset1) (toList iset2)))
-
+              (toList (union iset1 iset2)) =
+                (merge2 (toList iset1) (toList iset2)))
