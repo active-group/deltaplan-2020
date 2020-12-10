@@ -35,7 +35,7 @@ type ISet = list<int * int>
 // 1. Die Intervalle überlappen nicht
 // 2. Die Intervalle stehen nicht direkt nebeneinander
 // 3. Bei jedem Paar (lo, hi) gilt lo <= hi
-
+// 4. Die Intervalle sind nach Größe sortiert
 
 module ISet =
     // Interval in Liste von Zahlen umwandeln
@@ -62,5 +62,16 @@ module ISet =
     let toList iset =
         mmerge (List.map (fun (lo, hi) -> range lo hi) iset)
 
-     let union (iset1: ISet) (iset2: ISet): ISet =
-        ???
+
+    let rec union (iset1: ISet) (iset2: ISet): ISet = []
+
+    module Test =
+        open FsCheck
+        open FsCheck.Util
+
+        let unionCorrect =
+            Prop.forAll (Arb.pair Arb.iset Arb.iset) (fun (iset1, iset2) ->
+              (toList (union iset1 iset2))
+              =
+              (merge2 (toList iset1) (toList iset2)))
+
