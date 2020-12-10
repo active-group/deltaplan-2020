@@ -63,7 +63,10 @@ module ISet =
         mmerge (List.map (fun (lo, hi) -> range lo hi) iset)
 
 
-    let rec union (iset1: ISet) (iset2: ISet): ISet = []
+    let rec union (iset1: ISet) (iset2: ISet): ISet =
+        match (iset1, iset2) with
+        | ([], iset2) -> iset2
+        | (iset1, []) -> iset1
 
     module Arb =
       open FsCheck
