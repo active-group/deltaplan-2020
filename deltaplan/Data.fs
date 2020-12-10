@@ -302,12 +302,52 @@ module Examples =
     match map with
     | [] -> None
     | ((key', value')::rest) ->
-        match key' with
-        | key -> Some value'
-        | _-> lookupMap key (Map rest)
+        if key = key'
+        then Some value'
+        else lookupMap key (Map rest)
 
-//        if key = key'
-//        then Some value'
-//        else lookupMap key (Map rest)
+// funktioniert nicht:
+//        match key' with
+//        | key -> Some value'
+//        | _-> lookupMap key (Map rest)
+
+  // "Produkt von den Einträgen bei key1 und key2."
+  let multiplyKeys (map: Map<'key, int>) (key1: 'key) (key2: 'key): option<int> =
+        match lookupMap key1 map with
+        | None -> None
+        | Some value1 ->
+          match lookupMap key2 map with
+          | None -> None
+          | Some value2 -> Some (value1 * value2)
+
+
+  // Monade
+  type OptionallyBuilder() =
+    member this.Bind(optional: option<'a>, next: 'a -> option<'b>): option<'b> =
+      match optional with
+      | None -> None
+      | Some value -> next value
+
+    member this.Return(value: 'a): option<'a> = Some value
+
+  let optionally = new OptionallyBuilder()
+
+  let multiplyKeys' (map: Map<'key, int>) (key1: 'key) (key2: 'key): option<int> =
+    // computation expression / workflow
+    (*
+    optionally {
+        let! value1 = (flip lookupMap) map key1 // Bind
+        let! value2 = (flip lookupMap) map key2
+        return (value1 * value2)  // Return
+    }
+    *)
+    optionally.Bind (lookupMap key1 map,
+      fun value1 ->
+        optionally.Bind (lookupMap key2 map,
+          fun value2 ->
+            optionally.Return (value1 * value2)))
+
+
+
 
 
