@@ -31,6 +31,12 @@ module Examples =
 // Menge von ints als Liste von Intervallen
 type ISet = list<int * int>
 
+// Invariante: Es gibt nur 1 ISet pro Menge von Zahlen
+// 1. Die Intervalle überlappen nicht
+// 2. Die Intervalle stehen nicht direkt nebeneinander
+// 3. Bei jedem Paar (lo, hi) gilt lo <= hi
+
+
 module ISet =
     // Interval in Liste von Zahlen umwandeln
     let rec range lo hi =
@@ -56,4 +62,5 @@ module ISet =
     let toList iset =
         mmerge (List.map (fun (lo, hi) -> range lo hi) iset)
 
-      
+     let union (iset1: ISet) (iset2: ISet): ISet =
+        ???
