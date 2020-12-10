@@ -399,4 +399,58 @@ module Examples =
     }
 
 
+  (*
+  put "Mike" 5
+  x = get "Mike"
+  put "Mike" (x+1)
+  return x+5
+  *)
+  (*
+  // Fehlschlag
+  type DBCommand =
+    | Put of string * int
+    | Get of string
 
+  type DBProgram = list<DBCommand>
+
+  let p1 = [Put ("Mike", 5);
+            Get "Mike";
+            Put ("Mike", (x+1))]
+
+  *)
+
+  type DB<'result> =
+    | Get of string * (int -> DB<'result>)
+    | Put of string * int * (unit -> DB<'result>)
+    | Done of 'result
+
+  let p1 = Put ("Mike", 5, fun () ->
+           Get ("Mike", fun x ->
+           Put ("Mike", x+1, fun () ->
+           Done (x+5))))
+
+  type DBBuilder() =
+    member this.Bind(db: DB<'a>, next: 'a -> DB<'b>): DB<'b> =
+      match db with
+      | Get (key, callback) ->
+        Get (key, fun value ->
+                    this.Bind (callback value, next))
+      | Put (key, value, callback) ->
+        Put (key, value,
+             fun () ->
+                this.Bind (callback (), next))
+      | Done result -> next result
+
+    member this.Return(value: 'a): DB<'a> = Done value
+
+  let db = new DBBuilder()
+
+  let get key = Get (key, Done)
+  let put key value = Put (key, value, Done)
+
+  let p1' = db {
+    let! () = put "Mike" 5
+    let! x = get "Mike"
+    let! () = put "Mike" (x+1)
+    return (x+5)
+  }
