@@ -348,6 +348,55 @@ module Examples =
             optionally.Return (value1 * value2)))
 
 
+  // Result.bind ::
+  // ('a -> Result<'b, 'error>) -> Result<'a, 'error> -> Result<'b, 'error>
+
+
+
+  type Request =
+      { Name: string
+        Email: string }
+
+  // Define some logic for what defines a valid name.
+  //
+  // Generates a Result which is an Ok if the name validates;
+  // otherwise, it generates a Result which is an Error.
+  let validateName name =
+      match name with
+      | null -> Error "No name found."
+      | "" -> Error "Name is empty."
+      | "bananas" -> Error "Bananas is not a name."
+      | _ -> Ok name
+
+  // Similarly, define some email validation logic.
+  let validateEmail email =
+      match email with
+      | null -> Error "No email found."
+      | "" -> Error "Email is empty."
+      | s when s.EndsWith("bananas.com") -> Error "No email from bananas.com is allowed."
+      | _ -> Ok (email.ToLower())
+
+  type ResultBuilder() =
+    member this.Bind(result: Result<'a, 'error>,
+                     next: 'a -> Result<'b, 'error>): Result<'b, 'error> =
+      Result.bind next result
+
+    member this.Return(value: 'a): Result<'a, 'error> = Ok value
+
+  let with_railway = new ResultBuilder()
+
+  let validateRequest' reqResult =
+      reqResult
+      |> Result.bind validateName
+      |> Result.bind validateEmail
+
+
+  let validateRequest name email =
+    with_railway {
+        let! name = validateName name
+        let! email = validateEmail email
+        return { Name = name; Email = email }
+    }
 
 
 
