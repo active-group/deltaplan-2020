@@ -1,5 +1,3 @@
-﻿#load "Component1.fs"
-// Learn more about F# at http://fsharp.org. See the 'F# Tutorial' project
-// for more guidance on F# programming.
+﻿#r "bin/Debug/deltaplan.dll"
 
-open deltaplan
+open Data.Examples
