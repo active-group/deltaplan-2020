@@ -88,6 +88,25 @@ module Examples =
     | Snake { length = l; thickness = t } ->
         Snake { length = l; thickness = t + amount }
 
+  let feedAnimal1 = feedAnimal 1
+
+  // let feedAnimal' (animal: Animal) (amount: int): Animal =
+  // feedAnimal amount animal
+
+  // 'a: Typvariable
+  // val flip :: ('a -> 'b -> 'c) -> ('b -> 'a -> 'c)
+  let flip g b a = g a b
+
+  let feedAnimal' = flip feedAnimal
+
+  let feedAnimal2 (amount, animal) =
+    match animal with
+    | Dillo (Alive, weight) ->
+        Dillo (Alive, weight + amount)
+    | Dillo (Dead, weight) -> animal
+    | Snake { length = l; thickness = t } ->
+        Snake { length = l; thickness = t + amount }
+
 
   // Eine Liste ist eins der folgenden:
   // - die leere Liste
