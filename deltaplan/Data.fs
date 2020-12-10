@@ -1,15 +1,28 @@
 ﻿namespace Data
 
 module Examples =
+  // Ein Haustier ist *eins der folgenden:*
+  // - Hund ODER
+  // - Katze ODER
+  // - Schlange
+  // Fallunterscheidung / gemischten Daten
+  // F#: algebraischer Datentyp
+  // algebraic data type
   type Pet = Hund | Katze | Schlange
 
   // Ist Haustier niedlich?
   let isCute (pet: Pet): bool =
+    // Verzweigung
     match pet with
     | Hund -> true
     | Katze -> true
     | Schlange -> false
 
+  // Eine Uhrzeit besteht aus: / hat folgende Eigenschaften:
+  // - Stunde UND
+  // - Minute
+  // Zusammengesetzten Daten
+  // F#: Record-Typ
   type Time = { hour: int
                 minute: int }
 
@@ -17,6 +30,7 @@ module Examples =
   let time1 = { hour = 12; minute = 24 }
   let time2 = { hour = 11; minute = 3 }
 
+  // Minuten seit Mitternacht
   let msm (time: Time): int =
     time.hour * 60 + time.minute
 
@@ -31,15 +45,31 @@ module Examples =
 
   type SnakeType = { length: int; thickness: int }
 
+  // Ein Tier ist eins der folgenden:
+  // - ein Gürteltier
+  // - eine Klapperschlange
+
+  // Ein Gürteltier hat folgende Eigenschaften:
+  // - tot oder lebendig
+  // - Gewicht
+
+  // Eine Klapperschlange hat folgende Eigenschaften:
+  // - Länge
+  // - Dicke
+
+
   // algebraischer Datentyp
   type Animal =
     // gemischte Daten: Jeder Fall braucht Konstruktor
     | Dillo of Liveness * int
     | Snake of SnakeType
 
+  // Gürteltier, lebendig, 12kg
   let animal1: Animal = Dillo (Alive, 12)
+  // Klapperschlange, Länge 3m, Dicke 10cm
   let animal2 = Snake { length = 300; thickness = 10 }
 
+  // Tier überfahren
   let runOverAnimal (animal: Animal): Animal =
     match animal with
     | Dillo (_, weight) ->
@@ -52,7 +82,8 @@ module Examples =
   // val feedAnimal : int -> (Animal -> Animal)
   let feedAnimal (amount: int) (animal: Animal): Animal =
     match animal with
-    | Dillo (Alive, weight) -> Dillo (Alive, weight + amount)
+    | Dillo (Alive, weight) ->
+        Dillo (Alive, weight + amount)
     | Dillo (Dead, weight) -> animal
     | Snake { length = l; thickness = t } ->
         Snake { length = l; thickness = t + amount }
