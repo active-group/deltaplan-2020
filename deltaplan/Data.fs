@@ -89,6 +89,7 @@ module Examples =
         Snake { length = l; thickness = t + amount }
 
   let feedAnimal1 = feedAnimal 1
+  let animal1' = animal1 |> feedAnimal 1
 
   // let feedAnimal' (animal: Animal) (amount: int): Animal =
   // feedAnimal amount animal
@@ -99,6 +100,7 @@ module Examples =
 
   let feedAnimal' = flip feedAnimal
 
+  // val feedAnimal2 :: int * Animal -> Animal
   let feedAnimal2 (amount, animal) =
     match animal with
     | Dillo (Alive, weight) ->
@@ -107,6 +109,7 @@ module Examples =
     | Snake { length = l; thickness = t } ->
         Snake { length = l; thickness = t + amount }
 
+  // feedAnimal2(1, animal1) 
 
   // Eine Liste ist eins der folgenden:
   // - die leere Liste
@@ -123,6 +126,12 @@ module Examples =
   let listn2 = Cons (1, Cons (2, Empty))
   // 3elementige Liste: 3 5 7
   let listn3 = Cons (3, Cons (5, Cons (7, Empty)))
+
+  let rec listSum'' (list: List<int>): int =
+    match list with
+    | Empty -> 0
+    | Cons (first, rest) ->
+        first + (listSum'' rest)
 
   // Elemente einer Liste addieren
   let rec listSum (list: list<int>): int =
